@@ -1,3 +1,7 @@
+body, html, #root{
+  height: 100%;
+  overflow-y: auto;
+}
 
 .App-header {
   background-color: #282c34;
@@ -47,10 +51,53 @@
   display: flex;
     align-items: center;
     justify-content: center;
-    height: 80vh;
+    height: 100vh;
 }
 
-.main{
-  background-color: #f8f9fa;
+.chatContainer{
+  padding:4% 0 0 0;
 }
 
+.messageContainer{
+  height: 75vh;
+  box-sizing: border-box;
+  overflow: hidden;
+  overflow-y: scroll;
+}
+
+.container {
+  border: 2px solid #dedede;
+  background-color: #f1f1f1;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 10px 0;
+  max-width: 50%;
+}
+
+.time-right {
+  float: right;
+  color: #aaa;
+}
+
+.time-left {
+  float: left;
+  color: #999;
+}
+
+.container::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.self{
+  float: right;
+  clear: both;
+}
+
+.other{
+  float: left;
+  clear: both;
+  border-color: #ccc;
+  background-color: #ddd;
+}

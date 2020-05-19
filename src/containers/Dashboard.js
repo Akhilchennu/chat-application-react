@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
 import Hidden from '@material-ui/core/Hidden';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Contacts from '../components/Contacts.js';
 import Searchinput from '../components/Searchinput';
-import Header  from '../components/Header';
+import Header from '../components/Header';
 import Nomessages from '../components/Nomessages';
+import ChatContainer from './ChatContainer';
 
 const drawerWidth = 240;
 
@@ -20,7 +21,6 @@ const useStyles = makeStyles((theme) => ({
             flexShrink: 0,
         },
     },
-    // necessary for content to be below app bar
     toolbar: theme.mixins.toolbar,
     drawerPaper: {
         width: drawerWidth,
@@ -28,6 +28,7 @@ const useStyles = makeStyles((theme) => ({
     content: {
         flexGrow: 1,
         padding: theme.spacing(3),
+        paddingRight:0
     },
 }));
 
@@ -35,17 +36,22 @@ function Dashboard(props) {
     const { window } = props;
     const classes = useStyles();
     const theme = useTheme();
-    const [mobileOpen, setMobileOpen] = React.useState(false);
+    const [mobileOpen, setMobileOpen] = useState(false);
+    const [chatId, setChatId] = useState('');
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
     };
 
+    const openChatContainer = (chatid) => {
+        setChatId(chatid)
+    }
+
     const container = window !== undefined ? () => window().document.body : undefined;
 
     return (
         <div className={classes.root}>
-            <Header handleDrawerToggle={()=>handleDrawerToggle()}/>
+            <Header handleDrawerToggle={() => handleDrawerToggle()} />
             <nav className={classes.drawer} aria-label="Conatcts">
                 <Hidden smUp implementation="css">
                     <Drawer
@@ -64,7 +70,7 @@ function Dashboard(props) {
                         <>
                             <Searchinput />
                             <Divider />
-                            <Contacts />
+                            <Contacts openChatContainer={(chatid) => openChatContainer(chatid)} />
                         </>
                     </Drawer>
                 </Hidden>
@@ -79,14 +85,14 @@ function Dashboard(props) {
                         <>
                             <Searchinput />
                             <Divider />
-                            <Contacts />
+                            <Contacts openChatContainer={(chatid) => openChatContainer(chatid)} />
                         </>
                     </Drawer>
                 </Hidden>
             </nav>
-            <main className={`${classes.content} main`}>
-            <div className={classes.toolbar} />
-              <Nomessages message="Open chats to check messages"/>
+            <main className={`${classes.content}`}>
+                {chatId && chatId !== '' ? <ChatContainer chatId={chatId} /> :
+                    <Nomessages message="Open chats to check messages" />}
             </main>
         </div>
     )
