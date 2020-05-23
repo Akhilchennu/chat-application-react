@@ -48,8 +48,8 @@ const Dashboard = (props) => {
     const [contacts, setContacts] = useState([]);
     const [messageData, setMessageData] = useState({});
     const [searchContacts, setSearchResult] = useState(contacts);
-    const [typingStatus,setTypingStatus]=useState({});
-    const socket = openSocket('http://localhost:3001');
+    const [typingStatus, setTypingStatus] = useState({});
+    const socket = openSocket('http://localhost:3001');//ws
     const userData = useSelector(state => state.userData || {});
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
@@ -63,12 +63,14 @@ const Dashboard = (props) => {
         dataResponce.then(async (response) => {
             if (response.success) {
                 const initialMessageData = {};
-                const typingUserStatus={};
+                const typingUserStatus = {};
                 response.users.forEach((user) => {
                     const userid = user["_id"];
                     initialMessageData[userid] = []
+                    typingUserStatus[userid]=false;
                 })
-                setMessageData(initialMessageData)
+                setMessageData(initialMessageData);
+                setTypingStatus(typingUserStatus);
                 await dispatch({
                     type: "ALLUSERDATA",
                     allUsers: response.users
@@ -81,18 +83,93 @@ const Dashboard = (props) => {
         });
         socket.emit('join', { userid: userData["_id"] });
         socket.on("new_msg", async (data) => {
-            let newMessageData=[];
-            let chatId=''
-            await setChatId(previousChatId=>{
-                chatId=previousChatId
+            let newMessageData = {};
+            let chatId = '';
+            let typeData={};
+            await setChatId(previousChatId => {
+                chatId = previousChatId
             })
-            await setMessageData(prevMessageData=>{
-                newMessageData={...prevMessageData}
+            await setMessageData(prevMessageData => {
+                newMessageData = { ...prevMessageData }
             })
-            
+            await setTypingStatus(prevTypeData=>{
+                typeData={...prevTypeData}
+            })
             newMessageData[data["sentId"]].push(data);
             setMessageData(newMessageData);
             chatId && setChatId(chatId);
+            debugger
+            setTypingStatus(typeData);
+            //calling this emit to say sent user last message was received for double tick as broadcast emit doesnt 
+            //support callback 
+            socket.emit('LASTMESSAGE',data);
+            //calling this for blue tick status to send back if the received used had open the chat container
+            chatId=== data.sentId && socket.emit('blueTickStatus',data.sentId,data.toId);
+        })
+        socket.on("typeStatus",async (data)=>{
+            let newMessageData = [];
+            let chatId = '';
+            let typeData={};
+            await setChatId(previousChatId => {
+                chatId = previousChatId
+            })
+            await setMessageData(prevMessageData => {
+                newMessageData = { ...prevMessageData }
+            })
+            await setTypingStatus(prevTypeData=>{
+                typeData={...prevTypeData}
+            })
+
+            typeData[data["sentId"]]=data.status;
+            setMessageData(newMessageData);
+            chatId && setChatId(chatId);
+            typeData && setTypingStatus(typeData);
+        })
+        socket.on("LASTMESSAGERECEIVED",async (data)=>{
+            let newMessageData = [];
+            let chatId = '';
+            let typeData={};
+            await setChatId(previousChatId => {
+                chatId = previousChatId
+            })
+            await setMessageData(prevMessageData => {
+                newMessageData = { ...prevMessageData }
+            })
+            await setTypingStatus(prevTypeData=>{
+                typeData={...prevTypeData}
+            })
+
+            newMessageData[chatId].forEach((chatData)=>{
+                if(chatData.seenStatus === false){
+                    chatData.seenStatus=true;
+                }
+           })
+            await setMessageData(newMessageData);
+            chatId && setChatId(chatId);
+            setTypingStatus(typeData);
+        })
+        socket.on("changeBlueTickStatus",async (receivedUserid,sentUserid)=>{
+            let newMessageData = [];
+            let chatId = '';
+            let typeData={};
+            await setChatId(previousChatId => {
+                chatId = previousChatId
+            })
+            await setMessageData(prevMessageData => {
+                newMessageData = { ...prevMessageData }
+            })
+            await setTypingStatus(prevTypeData=>{
+                typeData={...prevTypeData}
+            })
+
+            newMessageData[sentUserid].forEach((chatData)=>{
+                if(chatData.seenStatus !== "seen"){
+                    chatData.seenStatus="seen";   
+                }
+           })
+            await setMessageData(newMessageData);
+            chatId && setChatId(chatId);
+            setTypingStatus(typeData);
         })
     }, []);
 
@@ -100,6 +177,10 @@ const Dashboard = (props) => {
     const openChatContainer = (userId, contactName) => {
         setChatId(userId);
         setContactName(contactName);
+        //for blue tick status when user clicks the chat container
+        if(messageData[userId].length>0){
+            socket.emit('blueTickStatus',userId,userData["_id"]);
+        }
     }
 
     const onSearchEnter = (input) => {
@@ -138,7 +219,7 @@ const Dashboard = (props) => {
                         <>
                             <Searchinput onSearch={(input) => onSearchEnter(input)} />
                             <Divider />
-                            <Contacts contacts={searchContacts} openChatContainer={(userId, contactName) => openChatContainer(userId, contactName)} />
+                            <Contacts contacts={searchContacts} typingStatus={typingStatus} openChatContainer={(userId, contactName) => openChatContainer(userId, contactName)} />
                         </>
                     </Drawer>
                 </Hidden>
@@ -153,13 +234,14 @@ const Dashboard = (props) => {
                         <>
                             <Searchinput onSearch={(input) => onSearchEnter(input)} />
                             <Divider />
-                            <Contacts contacts={searchContacts} openChatContainer={(userId, contactName) => openChatContainer(userId, contactName)} />
+                            <Contacts contacts={searchContacts} typingStatus={typingStatus} openChatContainer={(userId, contactName) => openChatContainer(userId, contactName)} />
                         </>
                     </Drawer>
                 </Hidden>
             </nav>
             <main className={`${classes.content}`}>
-                {chatId && chatId !== '' ? <ChatContainer socket={socket} chatData={{ chatId: chatId, contactName: contactName }} setMessage={(selfUserMessage) => setMessage(selfUserMessage)} messageData={messageData[chatId]} /> :
+                {chatId && chatId !== '' ? <ChatContainer socket={socket} chatData={{ chatId: chatId, contactName: contactName }} 
+                setMessage={(selfUserMessage) => setMessage(selfUserMessage)} messageData={messageData[chatId]} /> :
                     <Nomessages message="Open chats to check messages" />}
             </main>
         </div>

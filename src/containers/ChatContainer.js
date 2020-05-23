@@ -37,13 +37,21 @@ const ChatContainer = (props) => {
     const onSendClick = () => {
         if (textInput.current.innerHTML.toString().trim().length > 0 && textInput.current.innerText.trim().length > 0) {
             const timeNow = new Date();
-            const HtmlObject = { toId: chatData.chatId,
-                 sentId: userData["_id"], 
-                 sentName: userData["name"], 
-                 toName: chatData.contactName, 
-                 htmlData: textInput.current.innerHTML.toString().trim(),
-                 time:`${timeNow.getHours()}:${timeNow.getMinutes()} `};
+            const HtmlObject = {
+                toId: chatData.chatId,
+                sentId: userData["_id"],
+                sentName: userData["name"],
+                toName: chatData.contactName,
+                htmlData: textInput.current.innerHTML.toString().trim(),
+                time: `${timeNow.getHours()}:${timeNow.getMinutes()} `,
+                seenStatus:false
+            };
+            const UserData={
+                toId: chatData.chatId,
+                sentId: userData["_id"],status:false
+            }
             socket.emit('sendMessage', HtmlObject);
+            socket.emit('sendTypeStatus',UserData)
             setMessage(HtmlObject);
             textInput.current.innerHTML = ''
             textInput.current.focus();
@@ -69,9 +77,15 @@ const ChatContainer = (props) => {
                         sentName: userData["name"],
                         toName: chatData.contactName,
                         imageData: btoa(evt.target.result),
-                        time:`${timeNow.getHours()}:${timeNow.getMinutes()} `
+                        time: `${timeNow.getHours()}:${timeNow.getMinutes()} `,
+                        seenStatus:false
                     };
+                    const UserData={
+                        toId: chatData.chatId,
+                        sentId: userData["_id"],status:false
+                    }
                     socket.emit('sendMessage', HtmlObject);
+                    socket.emit('sendTypeStatus',UserData)
                     setMessage(HtmlObject);
                 };
                 reader.readAsBinaryString(event.target.files[0])
@@ -83,15 +97,27 @@ const ChatContainer = (props) => {
         }
     }
 
-    const onEditorInput=(event)=>{
-        debugger
+    const onEditorInput = (event) => {
+        if (textInput.current.innerHTML.toString().trim().length === 1) {
+            const UserData={
+                toId: chatData.chatId,
+                sentId: userData["_id"],status:true
+            }
+            socket.emit('sendTypeStatus',UserData)
+        } else if (textInput.current.innerHTML.toString().trim().length === 0) {
+            const UserData={
+                toId: chatData.chatId,
+                sentId: userData["_id"],status:false
+            }
+            socket.emit('typeStatus',UserData)
+        }
     }
 
     return (
         <div className="chatContainer">
             {messageData.length > 0 ? <MessageContainer messageData={messageData} /> : <Nomessages message="send messages now" />}
             <div className={`${classes.root}`}>
-                <div className="textarea" id="textField" ref={textInput} contentEditable="true" onFocus={(event)=>{onEditorInput(event)}} data-placeholder="Type message.." onKeyDown={(event) => onEnter(event)}></div>
+                <div className="textarea" id="textField" ref={textInput} contentEditable="true" onInput={(event) => { onEditorInput(event) }} data-placeholder="Type message.." onKeyDown={(event) => onEnter(event)}></div>
                 <input accept="image/*" className={classes.inputfile} id="icon-button-file" type="file" onChange={(event) => onImageClick(event)} />
                 <label htmlFor="icon-button-file">
                     <IconButton color="primary" aria-label="upload picture" title="upload picture" component="span">

@@ -10,13 +10,14 @@ const Contacts = (props) => {
     }
     
     const {contacts} =props || []
+    const {typingStatus}=props
     
     return (
         <div>
             <List>
                 {contacts.map((user, index) => (
                     <ListItem button key={user["_id"]} onClick={()=>handleContactCLick(user)}>
-                        <ListItemText primary={user["name"]} secondary={"typing"}/>
+                        <ListItemText primary={user["name"]} secondary={typingStatus && typingStatus[user["_id"]] ?"typing..":undefined}/>
                     </ListItem>
                 ))}
             </List>
