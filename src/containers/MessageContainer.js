@@ -1,22 +1,38 @@
-import React from 'react';
-
+import React,{useEffect} from 'react';
+import { useSelector } from 'react-redux';
 
 const MessageContainer = (props) => {
 
-    return (
-        <div className="messageContainer">
-            <div className="container self">
-                <p>Akhil</p>
-                <p>Hello. How are you today?</p>
-                <span class="time-right">11:00</span>
-            </div>
-            <div class="container darker other">
-                    <p>Abhi</p>
-                    <p>Hey! I'm fine. Thanks for asking!</p>
-                    <span class="time-left">11:01</span>
-            </div>
+    const { messageData } = props || []
 
-            </div>
+    const userData = useSelector(state => state.userData || {});
+
+    const messageBlock = React.createRef();
+
+    useEffect(()=>{
+        debugger
+        messageBlock.current.scrollTop = messageBlock.current.scrollHeight
+    },[messageData.length])
+
+    return (
+        <div className="messageContainer" ref={messageBlock}>
+            {messageData.map((displaydata,index) => {
+                return userData["_id"] === displaydata["sentId"] && userData["name"] === displaydata["sentName"] ?
+                    <div className="container self" key={index}>
+                        <p><b>{displaydata["sentName"]}</b></p>
+                        {displaydata.htmlData && !displaydata.imageData?<div dangerouslySetInnerHTML={{ __html: displaydata.htmlData }}></div>:
+                        <img src={`data:image/jpeg;base64,${displaydata.imageData}`} className="receivedImg" width="200" height="200" alt="base64 test"></img>}
+                        <p className="time-right">{displaydata.time}</p>
+                    </div> :
+                    <div className="container darker other" key="index">
+                        <p><b>{displaydata["sentName"]}</b></p>
+                        {displaydata.htmlData && !displaydata.imageData?<div dangerouslySetInnerHTML={{ __html: displaydata.htmlData }}></div>:
+                        <img src={`data:image/jpeg;base64,${displaydata.imageData}`} className="receivedImg" width="200" height="200" alt="base64 test"></img>}
+                        <p className="time-left">{displaydata.time}</p>
+                    </div>
+            })}
+        </div>
+
     );
 }
 

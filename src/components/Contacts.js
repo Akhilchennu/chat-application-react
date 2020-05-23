@@ -5,15 +5,18 @@ import ListItemText from '@material-ui/core/ListItemText';
 
 const Contacts = (props) => {
 
-    const handleContactCLick=(chatid)=>{
-        props.openChatContainer("chatid");
+    const handleContactCLick=(user)=>{
+        props.openChatContainer(user["_id"],user["name"]);
     }
+    
+    const {contacts} =props || []
+    
     return (
         <div>
             <List>
-                {['Abishek', 'Akhil', 'Hari', 'Bot', 'Abishek', 'Akhil', 'Hari', 'Bot', 'Abishek', 'Akhil', 'Hari', 'Bot', 'Abishek', 'Akhil', 'Hari', 'Bot', 'Abishek', 'Akhil', 'Hari', 'Bot', 'Abishek', 'Akhil', 'Hari', 'Bot'].map((text, index) => (
-                    <ListItem button key={index} onClick={()=>handleContactCLick("chatId")}>
-                        <ListItemText primary={text} />
+                {contacts.map((user, index) => (
+                    <ListItem button key={user["_id"]} onClick={()=>handleContactCLick(user)}>
+                        <ListItemText primary={user["name"]} secondary={"typing"}/>
                     </ListItem>
                 ))}
             </List>

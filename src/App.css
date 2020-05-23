@@ -45,13 +45,14 @@ body, html, #root{
 .signout{
   position: absolute;
   right:16px;
+  cursor: pointer;
 }
 
 .no-chat{
   display: flex;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+    height: 75vh;
 }
 
 .chatContainer{
@@ -68,10 +69,11 @@ body, html, #root{
 .container {
   border: 2px solid #dedede;
   background-color: #f1f1f1;
-  border-radius: 5px;
+  border-radius: 30px;
   padding: 10px;
   margin: 10px 0;
   max-width: 50%;
+  min-width: 30%;
 }
 
 .time-right {
@@ -100,4 +102,39 @@ body, html, #root{
   clear: both;
   border-color: #ccc;
   background-color: #ddd;
+}
+
+.width100 {
+width:100%;
+}
+
+.paperStyle{
+  width: 30%;
+}
+
+.textarea{
+  border: 2px solid #ccc;
+    width: 100%;
+    height: 54px;
+    position: relative;
+    overflow: auto;
+    border-radius: 5px;
+    overflow-x: hidden;
+    max-width:910px ;
+    box-sizing: border-box;
+}
+
+.textarea:empty:not(:focus):before {
+  content: attr(data-placeholder)
+}
+
+
+@media only screen and (max-width:475px){
+  .paperStyle{
+    width: 100%;
+  }
+}
+
+.receivedImg{
+  display: block;
 }

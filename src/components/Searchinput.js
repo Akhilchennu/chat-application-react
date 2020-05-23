@@ -7,8 +7,7 @@ const useStyles = makeStyles((theme) => ({
     root: {
         padding: '2px 4px',
         display: 'flex',
-        alignItems: 'center',
-        width: 400,
+        alignItems: 'center'
     },
     input: {
         marginLeft: theme.spacing(1),
@@ -19,12 +18,18 @@ const useStyles = makeStyles((theme) => ({
 const Searchinput = (props) => {
     const classes = useStyles();
 
+    const onSearch=(event)=>{
+        props.onSearch(event.target.value);
+    
+    }
+
     return (
         <Paper component="form" className={classes.root}>
             <InputBase
                 className={classes.input}
                 placeholder="Search..."
                 inputProps={{ 'aria-label': 'search google maps' }}
+                onChange={(event)=>onSearch(event)}
             />
         </Paper>
     );

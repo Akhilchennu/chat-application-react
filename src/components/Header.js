@@ -7,6 +7,10 @@ import Typography from '@material-ui/core/Typography';
 import Tooltip from '@material-ui/core/Tooltip';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import { makeStyles } from '@material-ui/core/styles';
+import { useSelector  } from 'react-redux';
+import {service} from '../services/service';
+import { useDispatch  } from "react-redux";
+import { withRouter } from 'react-router-dom';
 
 const drawerWidth = 240;
 
@@ -26,13 +30,31 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Header = (props) => {
+    
+    const dispatch = useDispatch();
+
     const classes = useStyles();
+
+    const userData = useSelector(state => state.userData || {});
 
     const handleDrawerToggle = () => {
         const {handleDrawerToggle}=props;
         handleDrawerToggle();
     };
 
+    const logOut=()=>{
+        const dataResponce = service.logoutAPI();
+        dataResponce.then(async (response) => {
+            if (response.success) {
+                await dispatch({
+                    type: "AUTHENTICATE",
+                    login:false
+                })
+                props.history.push('/login');
+            }
+        })
+    }
+   const {name}=userData;
     return (
         <AppBar position="fixed" className={classes.appBar}>
             <Toolbar>
@@ -46,14 +68,14 @@ const Header = (props) => {
                     <MenuIcon />
                 </IconButton>
                 <Typography variant="h6" noWrap className="username">
-                    Akhil Chennu
+                    {name}
           </Typography>
                 <Tooltip title="Sign out" aria-label="Sign out">
-                    <ExitToAppIcon className="signout" />
+                    <ExitToAppIcon className="signout" onClick={()=>logOut()}/>
                 </Tooltip>
             </Toolbar>
         </AppBar>
     );
 }
 
-export default Header;
+export default withRouter(Header);
