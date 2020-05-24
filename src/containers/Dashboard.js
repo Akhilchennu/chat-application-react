@@ -98,7 +98,6 @@ const Dashboard = (props) => {
             newMessageData[data["sentId"]].push(data);
             setMessageData(newMessageData);
             chatId && setChatId(chatId);
-            debugger
             setTypingStatus(typeData);
             //calling this emit to say sent user last message was received for double tick as broadcast emit doesnt 
             //support callback 
@@ -171,6 +170,10 @@ const Dashboard = (props) => {
             chatId && setChatId(chatId);
             setTypingStatus(typeData);
         })
+        return ()=>{
+            console.log("disconnect")
+            socket.disconnect()
+        }
     }, []);
 
 

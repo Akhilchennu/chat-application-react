@@ -50,6 +50,14 @@ const Header = (props) => {
                     type: "AUTHENTICATE",
                     login:false
                 })
+                await dispatch({
+                    type:'USERDATA',
+                    userData:{}
+                })
+                await dispatch({
+                    type:'ALLUSERDATA',
+                    allUsers:[]
+                })
                 props.history.push('/login');
             }
         })

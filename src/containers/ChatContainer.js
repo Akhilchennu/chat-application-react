@@ -109,13 +109,13 @@ const ChatContainer = (props) => {
                 toId: chatData.chatId,
                 sentId: userData["_id"],status:false
             }
-            socket.emit('typeStatus',UserData)
+            socket.emit('sendTypeStatus',UserData)
         }
     }
 
     return (
         <div className="chatContainer">
-            {messageData.length > 0 ? <MessageContainer messageData={messageData} /> : <Nomessages message="send messages now" />}
+            {messageData.length > 0 ? <MessageContainer messageData={messageData} textInputRef={textInput}/> : <Nomessages message="send messages now" />}
             <div className={`${classes.root}`}>
                 <div className="textarea" id="textField" ref={textInput} contentEditable="true" onInput={(event) => { onEditorInput(event) }} data-placeholder="Type message.." onKeyDown={(event) => onEnter(event)}></div>
                 <input accept="image/*" className={classes.inputfile} id="icon-button-file" type="file" onChange={(event) => onImageClick(event)} />

@@ -6,13 +6,17 @@ import DoneAllOutlinedIcon from '@material-ui/icons/DoneAllOutlined';
 const MessageContainer = (props) => {
 
     const { messageData } = props || []
+    const {textInputRef}=props
 
     const userData = useSelector(state => state.userData || {});
 
     const messageBlock = React.createRef();
 
     useEffect(()=>{
-        messageBlock.current.scrollTop = messageBlock.current.scrollHeight
+        messageBlock.current.scrollTop = messageBlock.current.scrollHeight;
+        if(textInputRef){
+            textInputRef.current.focus();
+        }
     },[messageData.length])
 
     return (
