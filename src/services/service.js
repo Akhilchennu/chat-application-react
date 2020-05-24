@@ -1,5 +1,6 @@
+const url='https://appgen-lets-chat.herokuapp.com'
 const signupAPI = (name, email, password) => {
-    return fetch('http://localhost:3001/signup', {
+    return fetch(`${url}/signup`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -14,7 +15,7 @@ const signupAPI = (name, email, password) => {
 }
 
 const loginAPI = (email, password) => {
-    return fetch('http://localhost:3001/login', {
+    return fetch(`${url}/login`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -28,7 +29,7 @@ const loginAPI = (email, password) => {
 }
 
 const getAuth=()=>{
-    return fetch('http://localhost:3001/verifyauth', {
+    return fetch(`${url}/verifyauth`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
@@ -38,7 +39,7 @@ const getAuth=()=>{
 }
 
 const logoutAPI=()=>{
-    return fetch('http://localhost:3001/logout', {
+    return fetch(`${url}/logout`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
@@ -48,7 +49,7 @@ const logoutAPI=()=>{
 }
 
 const getUserList=()=>{
-    return fetch('http://localhost:3001/users', {
+    return fetch(`${url}/users`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
